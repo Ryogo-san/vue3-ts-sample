@@ -7,7 +7,7 @@
             placeholder="＋ TODOを入力"
         />
         <div>{{ todoRef }}</div>
-        <button class="btn">追加</button>
+        <button class="btn" @click="addTodo">追加</button>
     </div>
 </template>
 
@@ -15,6 +15,22 @@
     import { ref } from "vue";
 
     const todoRef = ref("");
+    const todoListRef = ref([]);
+
+    const addTodo = () => {
+        // IDを簡易的にミリ秒で登録する
+        const id = new Date().getTime();
+
+        // 配列に入力TODOを格納
+        todoListRef.value.push({ id: id, task: todoRef.value });
+
+        // そのまま保存するとただの文字列になるため、JSONコードにシリアライズ
+        // リストの値を更新するイメージ
+        localStorage.todoList = JSON.stringify(todoListRef.value);
+
+        // 登録後は入力欄を空にする
+        todoRef.value = "";
+    };
 </script>
 
 <style scoped>
