@@ -7,7 +7,8 @@
             placeholder="＋ TODOを入力"
         />
         <div>{{ todoRef }}</div>
-        <button class="btn" @click="addTodo">追加</button>
+        <button class="btn" @click="editTodo" v-show="isEditRef">変更</button>
+        <button class="btn" @click="addTodo" v-show="!isEditRef">追加</button>
     </div>
     <div class="box_list">
         <div class="todo_list" v-for="todo in todoListRef" :key="todo.id">
@@ -16,7 +17,7 @@
                 <label>{{ todo.task }}</label>
             </div>
             <div class="btns">
-                <button class="btn green">編</button>
+                <button class="btn green" @click="showTodo(todo.id)">編</button>
                 <button class="btn pink">削</button>
             </div>
         </div>
@@ -31,6 +32,9 @@
     const ls = localStorage.todoList;
     todoListRef.value = ls ? JSON.parse(ls) : [];
 
+    const isEditRef = ref(false);
+    let editId = -1;
+
     const addTodo = () => {
         // IDを簡易的にミリ秒で登録する
         const id = new Date().getTime();
@@ -43,6 +47,29 @@
         localStorage.todoList = JSON.stringify(todoListRef.value);
 
         // 登録後は入力欄を空にする
+        todoRef.value = "";
+    };
+
+    const showTodo = (id) => {
+        const todo = todoListRef.value.find((todo) => todo.id === id);
+        todoRef.value = todo.task;
+        isEditRef.value = true;
+        editId = id;
+    };
+
+    const editTodo = () => {
+        const todo = todoListRef.value.find((todo) => todo.id === editId);
+
+        const idx = todoListRef.value.findIndex((todo) => todo.id === editId);
+
+        todo.task = todoRef.value;
+
+        // splice関数でインデックスをもとに対象オブジェクトを置き換え
+        todoListRef.value.splice(idx, 1, todo);
+
+        localStorage.todoList = JSON.stringify(todoListRef.value);
+        isEditRef.value = false; // 編集モードを解除
+        editId = -1;
         todoRef.value = "";
     };
 </script>
