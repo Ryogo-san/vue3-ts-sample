@@ -31,59 +31,31 @@
     import { useTodoList } from "/src/composables/useTodoList.js";
 
     const todoRef = ref("");
-    const todoListRef = ref([]);
-    const ls = localStorage.todoList;
-    todoListRef.value = ls ? JSON.parse(ls) : [];
-
     const isEditRef = ref(false);
-    let editId = -1;
+    const { todoListRef, add, show, edit, del, check } = useTodoList();
 
     const addTodo = () => {
-        // IDを簡易的にミリ秒で登録する
-        const id = new Date().getTime();
-
-        // 配列に入力TODOを格納
-        todoListRef.value.push({ id: id, task: todoRef.value });
-
-        // そのまま保存するとただの文字列になるため、JSONコードにシリアライズ
-        // リストの値を更新するイメージ
-        localStorage.todoList = JSON.stringify(todoListRef.value);
-
-        // 登録後は入力欄を空にする
+        add(todoRef.value);
         todoRef.value = "";
     };
 
     const showTodo = (id) => {
-        const todo = todoListRef.value.find((todo) => todo.id === id);
-        todoRef.value = todo.task;
+        todoRef.value = show(id);
         isEditRef.value = true;
-        editId = id;
     };
 
     const editTodo = () => {
-        const todo = todoListRef.value.find((todo) => todo.id === editId);
-
-        const idx = todoListRef.value.findIndex((todo) => todo.id === editId);
-
-        todo.task = todoRef.value;
-
-        // splice関数でインデックスをもとに対象オブジェクトを置き換え
-        todoListRef.value.splice(idx, 1, todo);
-
-        localStorage.todoList = JSON.stringify(todoListRef.value);
-        isEditRef.value = false; // 編集モードを解除
-        editId = -1;
+        edit(todoRef.value);
+        isEditRef.value = false;
         todoRef.value = "";
     };
 
     const deleteTodo = (id) => {
-        const { todo, idx } = useTodoList(id);
+        del(id);
+    };
 
-        const delMsg = "「" + todo.task + "」を削除しますか？";
-        if (!confirm(delMsg)) return;
-
-        todoListRef.value.splice(idx, 1);
-        localStorage.todoList = JSON.stringify(todoListRef.value);
+    const changeCheck = (id) => {
+        check(id);
     };
 </script>
 
