@@ -18,7 +18,9 @@
             </div>
             <div class="btns">
                 <button class="btn green" @click="showTodo(todo.id)">編</button>
-                <button class="btn pink">削</button>
+                <button class="btn pink" @click="deleteTodo(todo.id)">
+                    削
+                </button>
             </div>
         </div>
     </div>
@@ -71,6 +73,17 @@
         isEditRef.value = false; // 編集モードを解除
         editId = -1;
         todoRef.value = "";
+    };
+
+    const deleteTodo = (id) => {
+        const todo = todoListRef.value.find((todo) => todo.id === id);
+        const idx = todoListRef.value.findIndex((todo) => todo.id === id);
+
+        const delMsg = "「" + todo.task + "」を削除しますか？";
+        if (!confirm(delMsg)) return;
+
+        todoListRef.value.splice(idx, 1);
+        localStorage.todoList = JSON.stringify(todoListRef.value);
     };
 </script>
 
